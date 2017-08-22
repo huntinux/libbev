@@ -1,14 +1,16 @@
 /*
- * thread.h
+ * net.h
  *
- *  Created on: Aug 21, 2017
+ *  Created on: Aug 22, 2017
  *      Author: jinger
  */
 
-#ifndef SRC_THREAD_H_
-#define SRC_THREAD_H_
+#ifndef SRC_NET_H_
+#define SRC_NET_H_
 
 #include <event2/event.h>
+#include <event2/bufferevent.h>
+#include <event2/bufferevent_struct.h>
 #include <event2/event_struct.h>
 #include <pthread.h>
 
@@ -22,4 +24,14 @@ typedef struct {
     struct conn_queue * new_conn_queue;  /* queue of new connections to handle */
 } LIBEVENT_THREAD;
 
-#endif /* SRC_THREAD_H_ */
+extern struct event_base* main_base;
+
+void thread_init(int nthreads);
+
+int server_socket(int port);
+
+typedef void (*readcb)(struct bufferevent *bev, void *ctx);
+void set_worker_thread_readcb(readcb rcb);
+
+void start_work(int worker_thread_num, short port, readcb rcb);
+#endif /* SRC_NET_H_ */
